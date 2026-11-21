@@ -24,7 +24,7 @@ def get_client():
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError(
-            "GEMINI_API_KEY не задан. Укажите ключ в переменной окружения."
+            "GEMINI_API_KEY не задан. Укажите ключ в переменной окружения. $env:GEMINI_API_KEY=ваш_API_ключ"
         )
     return genai.Client(api_key=api_key)
 
@@ -56,8 +56,9 @@ def chat(client):
 
 def generate_catalog(count: int = 15, client=None) -> list[dict]:
     prompt = f"""
-Сгенерируй данные для каталога из {count} известных литературных произведений.
+Сгенерируй РОВНО {count} известных литературных произведений.
 Верни ТОЛЬКО валидный JSON-массив объектов без Markdown и пояснений.
+В массиве должно быть ровно {count} объектов.
 Каждый объект имеет поля:
 - title: точное название произведения на русском языке
 - author: имя автора на русском языке
@@ -81,6 +82,10 @@ def generate_catalog(count: int = 15, client=None) -> list[dict]:
         raise ValueError("Gemini вернула некорректный JSON") from exc
     if not isinstance(catalog, list):
         raise ValueError("Ожидался JSON-массив")
+    if len(catalog) != count:
+        raise ValueError(
+            f"Gemini вернула {len(catalog)} записей вместо запрошенных {count}"
+        )
     return catalog
 
 
