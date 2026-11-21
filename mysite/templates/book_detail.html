@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261121">
+    <title>{{ book.title }} - BookMix</title>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{% url 'home' %}"><span class="brand-mark">B</span><span>BookMix</span></a>
+    </header>
+    <main>
+        <a class="back-link" href="{% url 'home' %}">← Ко всем книгам</a>
+        <article class="detail-layout">
+            <div class="detail-cover" aria-hidden="true">{{ book.title|slice:":1" }}</div>
+            <div class="detail-content">
+                <p class="eyebrow">{{ book.publication_date|date:"Y" }}</p>
+                <h1>{{ book.title }}</h1>
+                <p class="detail-author">Автор: <a href="{% url 'author_detail' author_id=book.author_id %}">{{ book.author.name }}</a></p>
+                <p class="lead">{{ book.short_desc }}</p>
+                <h2>О произведении</h2>
+                <p>{% if book.details %}{{ book.details.description }}{% else %}Подробное описание пока не добавлено.{% endif %}</p>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

@@ -1,17 +1,56 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-    <script src="{% static 'js/script.js' %}" defer></script>
-    <title>BookMix - обзорщик книг</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261121-2">
+    <title>BookMix - каталог книг</title>
 </head>
 <body>
-    <header>
-        <h1>BookMix - обзорщик книг</h1>
+    <header class="site-header">
+        <a class="brand" href="{% url 'home' %}">
+            <span class="brand-mark">B</span>
+            <span>BookMix</span>
+        </a>
+        <form class="search" action="{% url 'home' %}" method="get">
+            <label class="sr-only" for="q">Поиск</label>
+            <input id="q" type="search" name="q" value="{{ query }}" placeholder="Название или автор">
+            <button type="submit">Найти</button>
+        </form>
     </header>
+
+    <main>
+        <div class="page-heading">
+            <div>
+                <p class="eyebrow">Литературный каталог</p>
+                <h1>{% if query %}Результаты поиска{% else %}Все книги{% endif %}</h1>
+            </div>
+            <span class="count">{{ books|length }} {% if books|length == 1 %}книга{% elif books|length >= 2 and books|length <= 4 %}книги{% else %}книг{% endif %}</span>
+        </div>
+
+        {% if books %}
+        <section class="book-grid">
+            {% for book in books %}
+            <article class="book-card">
+                <div class="cover" aria-hidden="true">{{ book.title|slice:":1" }}</div>
+                <div class="card-body">
+                    <p class="author"><a href="{% url 'author_detail' author_id=book.author_id %}">{{ book.author.name }}</a></p>
+                    <h2><a href="{% url 'book_detail' book_id=book.id %}">{{ book.title }}</a></h2>
+                    <p class="description">{{ book.short_desc }}</p>
+                    <a class="read-more" href="{% url 'book_detail' book_id=book.id %}">Подробнее <span aria-hidden="true">→</span></a>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+        {% else %}
+        <section class="empty-state">
+            <h2>Ничего не найдено</h2>
+            <p>Попробуйте изменить название или имя автора.</p>
+            <a class="read-more" href="{% url 'home' %}">Показать все книги</a>
+        </section>
+        {% endif %}
+    </main>
 </body>
 </html>
